@@ -1,4 +1,4 @@
-package main
+package uerror
 
 var (
 	ErrInternalServer     = New(500, "internal server error")
