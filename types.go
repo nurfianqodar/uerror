@@ -3,6 +3,9 @@ package main
 import (
 	"log"
 	"net/http"
+
+	ut "github.com/go-playground/universal-translator"
+	"github.com/go-playground/validator/v10"
 )
 
 type UError interface {
@@ -28,5 +31,17 @@ func New(code int, message string, e ...string) UError {
 		HTTPCode: code,
 		Message:  message,
 		Errors:   e,
+	}
+}
+
+func FromValidator(ve validator.ValidationErrors, trans ut.Translator) UError {
+	errs := make([]string, len(ve))
+	for _, e := range ve {
+		errs = append(errs, e.Translate(trans))
+	}
+	return &uerror{
+		HTTPCode: http.StatusBadRequest,
+		Message:  "validation error",
+		Errors:   errs,
 	}
 }
